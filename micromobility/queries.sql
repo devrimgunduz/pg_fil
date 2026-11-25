@@ -1,5 +1,5 @@
 --
--- pagila-ng: micromobility -- example queries
+-- pg_fil: micromobility -- example queries
 --
 -- Every query here runs against the generated data. Statements that change
 -- data run inside transactions that roll back, so the file can be run any

@@ -1,12 +1,16 @@
-# pagila-ng
+# pg_fil
 
 Five sample databases for PostgreSQL, set in businesses people use today.
 
 [Pagila](https://github.com/devrimgunduz/pagila) is a DVD rental store, a
 fine schema for examples in books, tutorials and talks, but renting DVDs
-isn't a 2026 thing. pagila-ng ("next generation") keeps the idea: realistic
-schemas and data that are fun to query, each built to show off a different
-part of modern PostgreSQL.
+isn't a 2026 thing. pg_fil keeps the idea: realistic schemas and data that
+are fun to query, each built to show off a different part of modern
+PostgreSQL.
+
+About the name: MySQL's sample database is Sakila, named after its dolphin
+(the name was suggested from SiSwati), and Pagila is Postgres + Sakila.
+*Fil* is Turkish for elephant, after Slonik, the PostgreSQL elephant.
 
 | Database | The business | What it shows off |
 |---|---|---|
@@ -104,7 +108,7 @@ extensions and creates all five databases (`streaming`, `stays`,
 minutes while the data is generated. Then:
 
 ```
-docker exec -it pagila-ng psql -U postgres -d stays
+docker exec -it pg_fil psql -U postgres -d stays
 ```
 
 pgAdmin runs on http://localhost:5050 (admin@admin.com / root) with the
@@ -133,4 +137,4 @@ PGHOST=localhost PGUSER=postgres scripts/check.sh ticketing
 
 ## License
 
-pagila-ng is made available under the [PostgreSQL License](LICENSE.txt).
+pg_fil is made available under the [PostgreSQL License](LICENSE.txt).

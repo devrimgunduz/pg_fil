@@ -1,5 +1,5 @@
 --
--- pagila-ng: micromobility -- sample data generator
+-- pg_fil: micromobility -- sample data generator
 --
 -- Run after schema.sql, into an empty database:
 --   psql -d micromobility -f generate-data.sql

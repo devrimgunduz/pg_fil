@@ -42,7 +42,7 @@ psql -d ticketing -v scale=3 -f generate-data.sql  # or: 3x the customers
 psql -d ticketing -f queries.sql                   # the single-session examples
 ```
 
-`schema.sql` creates a `pagila_ng_customer` role (NOLOGIN) for the
+`schema.sql` creates a `fil_customer` role (NOLOGIN) for the
 row-level security example. Roles are shared by all databases in a cluster,
 so it is only created if it doesn't exist yet.
 
@@ -133,12 +133,12 @@ Asynchronous notification "ticket_sold" with payload
 
 ## Row-level security
 
-The customer app connects as `pagila_ng_customer` and sets `app.customer_id`
+The customer app connects as `fil_customer` and sets `app.customer_id`
 per request. The policies then hide everyone else's tickets and orders:
 
 ```sql
 BEGIN;
-SET LOCAL ROLE pagila_ng_customer;
+SET LOCAL ROLE fil_customer;
 SET LOCAL app.customer_id = '42';
 SELECT count(*) FROM ticket;   -- 41, not 369622
 ROLLBACK;

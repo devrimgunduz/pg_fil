@@ -1,1 +1,1 @@
-pagila-ng:5432:*:postgres:123456
+pg_fil:5432:*:postgres:123456

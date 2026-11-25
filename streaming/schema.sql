@@ -1,5 +1,5 @@
 --
--- pagila-ng: streaming
+-- pg_fil: streaming
 --
 -- A subscription video streaming service: a catalog of movies and series,
 -- licensed per region for limited periods, accounts with profiles and

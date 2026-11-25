@@ -1,5 +1,5 @@
 --
--- pagila-ng: stays -- sample data generator
+-- pg_fil: stays -- sample data generator
 --
 -- Run after schema.sql, into an empty database:
 --   psql -d stays -f generate-data.sql

@@ -1,5 +1,5 @@
 --
--- pagila-ng: ticketing
+-- pg_fil: ticketing
 --
 -- Event ticketing for concerts, sports, theatre and comedy: venues with a
 -- nested seating plan, events with price tiers, a per-event seat inventory
@@ -334,27 +334,27 @@ CREATE TRIGGER notify_ticket_sold
 -- Row-level security
 --
 
--- The customer-facing app connects as pagila_ng_customer and sets
+-- The customer-facing app connects as fil_customer and sets
 -- app.customer_id for each request; the policies then only show that
 -- customer's tickets and orders. Table owners and superusers bypass RLS.
 DO $$
 BEGIN
-    IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'pagila_ng_customer') THEN
-        CREATE ROLE pagila_ng_customer NOLOGIN;
+    IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'fil_customer') THEN
+        CREATE ROLE fil_customer NOLOGIN;
     END IF;
 END
 $$;
 
 GRANT SELECT ON venue, section, seat, artist, event, price_tier, event_seat,
-                 ticket, orders, transfer TO pagila_ng_customer;
+                 ticket, orders, transfer TO fil_customer;
 
 ALTER TABLE ticket ENABLE ROW LEVEL SECURITY;
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY ticket_holder ON ticket FOR SELECT TO pagila_ng_customer
+CREATE POLICY ticket_holder ON ticket FOR SELECT TO fil_customer
     USING (holder_id = current_setting('app.customer_id', true)::integer);
 
-CREATE POLICY order_buyer ON orders FOR SELECT TO pagila_ng_customer
+CREATE POLICY order_buyer ON orders FOR SELECT TO fil_customer
     USING (customer_id = current_setting('app.customer_id', true)::integer);
 
 --

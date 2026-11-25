@@ -1,11 +1,11 @@
 {
   "Servers": {
     "1": {
-      "Name": "pagila-ng",
+      "Name": "pg_fil",
       "Group": "Servers",
       "Port": 5432,
       "Username": "postgres",
-      "Host": "pagila-ng",
+      "Host": "pg_fil",
       "PassFile": "/pgadmin4/pass",
       "SSLMode": "disable",
       "MaintenanceDB": "postgres"

@@ -1,5 +1,5 @@
 --
--- pagila-ng: ev-charging -- example queries
+-- pg_fil: ev-charging -- example queries
 --
 -- Every query here runs against the generated data. Statements that change
 -- data run inside transactions that roll back, so the file can be run any

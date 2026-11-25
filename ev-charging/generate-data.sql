@@ -1,5 +1,5 @@
 --
--- pagila-ng: ev-charging -- sample data generator
+-- pg_fil: ev-charging -- sample data generator
 --
 -- Run after schema.sql, into an empty database:
 --   psql -d ev-charging -f generate-data.sql

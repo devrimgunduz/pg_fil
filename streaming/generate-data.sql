@@ -1,5 +1,5 @@
 --
--- pagila-ng: streaming -- sample data generator
+-- pg_fil: streaming -- sample data generator
 --
 -- Run after schema.sql, into an empty database:
 --   psql -d streaming -f generate-data.sql

@@ -1,22 +1,22 @@
 volumes:
   pgdata:
 services:
-  pagila-ng:
+  pg_fil:
     build: .
-    container_name: pagila-ng
+    container_name: pg_fil
     environment:
       POSTGRES_PASSWORD: 123456
       POSTGRES_USER: postgres
     volumes:
       # The whole repository, read-only; docker/init.sh loads each database
       # from it on the first start (when the data volume is empty).
-      - .:/pagila-ng:ro
-      - ./docker/init.sh:/docker-entrypoint-initdb.d/1-pagila-ng-init.sh:ro
+      - .:/pg_fil:ro
+      - ./docker/init.sh:/docker-entrypoint-initdb.d/1-pg_fil-init.sh:ro
       - pgdata:/var/lib/postgresql
     ports:
       - 5432:5432
   pgadmin:
-    container_name: pagila-ng-pgadmin
+    container_name: pg_fil_pgadmin
     image: docker.io/dpage/pgadmin4
     restart: always
     environment:

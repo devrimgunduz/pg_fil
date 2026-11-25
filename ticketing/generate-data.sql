@@ -1,5 +1,5 @@
 --
--- pagila-ng: ticketing -- sample data generator
+-- pg_fil: ticketing -- sample data generator
 --
 -- Run after schema.sql, into an empty database:
 --   psql -d ticketing -f generate-data.sql

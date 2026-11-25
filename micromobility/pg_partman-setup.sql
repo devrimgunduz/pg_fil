@@ -1,5 +1,5 @@
 --
--- pagila-ng: micromobility -- optional pg_partman setup
+-- pg_fil: micromobility -- optional pg_partman setup
 --
 -- Hands future monthly partitions of vehicle_status over to pg_partman.
 -- schema.sql already creates partitions through 2026-12, so pg_partman is

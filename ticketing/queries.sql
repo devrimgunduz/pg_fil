@@ -1,5 +1,5 @@
 --
--- pagila-ng: ticketing -- example queries
+-- pg_fil: ticketing -- example queries
 --
 -- Every query here runs against the generated data. Statements that change
 -- data run inside transactions that roll back, so the file can be run any
@@ -106,7 +106,7 @@ $$;
 
 \echo '== 7. Row-level security: a customer only sees their own tickets'
 BEGIN;
-SET LOCAL ROLE pagila_ng_customer;
+SET LOCAL ROLE fil_customer;
 SET LOCAL app.customer_id = '42';
 SELECT t.ticket_id, e.name, e.starts_at, t.face_value
 FROM ticket t JOIN event e USING (event_id)

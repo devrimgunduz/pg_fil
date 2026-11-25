@@ -1,5 +1,5 @@
 --
--- pagila-ng: streaming -- example queries
+-- pg_fil: streaming -- example queries
 --
 -- Every query here runs against the generated data. Statements that change
 -- data run inside transactions that roll back, so the file can be run any

@@ -1,5 +1,5 @@
 --
--- pagila-ng: ev-charging -- optional pg_partman setup
+-- pg_fil: ev-charging -- optional pg_partman setup
 --
 -- Hands future monthly partitions of meter_value over to pg_partman.
 -- schema.sql already creates partitions through 2026-12, so pg_partman is
