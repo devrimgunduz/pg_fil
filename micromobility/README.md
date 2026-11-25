@@ -30,8 +30,8 @@ materialized view `daily_city_stats`.
 
 ## Install
 
-Requires PostgreSQL 18+ and PostGIS (`postgresql-18-postgis-3` on apt,
-`postgis37_18` on dnf). pg_partman is optional.
+Requires PostgreSQL 18+ and PostGIS (`postgresql-19-postgis-3` on apt,
+`postgis37_19` on dnf). pg_partman is optional.
 
 ```
 createdb micromobility

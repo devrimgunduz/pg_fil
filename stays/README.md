@@ -33,8 +33,8 @@ At the default scale there are 1,500 listings, 12,000 guests and about
 
 ## Install
 
-Requires PostgreSQL 18+ and PostGIS (`postgresql-18-postgis-3` on apt,
-`postgis37_18` on dnf; btree_gist and pg_trgm ship with PostgreSQL).
+Requires PostgreSQL 18+ and PostGIS (`postgresql-19-postgis-3` on apt,
+`postgis37_19` on dnf; btree_gist and pg_trgm ship with PostgreSQL).
 
 ```
 createdb stays

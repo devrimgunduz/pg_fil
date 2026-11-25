@@ -33,8 +33,8 @@ Functions and views: `record_session(...)`, `available_titles(region, day)`,
 
 ## Install
 
-Requires PostgreSQL 18+ and pgvector (`postgresql-18-pgvector` on apt,
-`pgvector_18` on dnf). pg_partman is optional.
+Requires PostgreSQL 18+ and pgvector (`postgresql-19-pgvector` on apt,
+`pgvector_19` on dnf). pg_partman is optional.
 
 ```
 createdb streaming
