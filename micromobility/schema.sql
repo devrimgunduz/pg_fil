@@ -147,14 +147,14 @@ CREATE TABLE vehicle_status (
 CREATE INDEX vehicle_status_reported_at_brin ON vehicle_status USING brin (reported_at);
 CREATE INDEX vehicle_status_vehicle_idx ON vehicle_status (vehicle_id, reported_at DESC);
 
--- Monthly partitions for the generated data (2026-06 to 2026-12; local
--- midnight on 2026-07-01 is still June in UTC), named the way pg_partman
--- names them; pg_partman-setup.sql can take over from 2027-01.
+-- Monthly partitions from 2026-06 (local midnight on 2026-07-01 is still
+-- June in UTC) to 2027-12, a year past the generated data, named the way
+-- pg_partman names them; pg_partman-setup.sql can take over from 2028-01.
 DO $$
 DECLARE
     m date;
 BEGIN
-    FOR m IN SELECT generate_series(date '2026-06-01', date '2026-12-01', interval '1 month')::date
+    FOR m IN SELECT generate_series(date '2026-06-01', date '2027-12-01', interval '1 month')::date
     LOOP
         EXECUTE format(
             'CREATE TABLE %I PARTITION OF vehicle_status FOR VALUES FROM (%L) TO (%L)',
@@ -164,6 +164,11 @@ BEGIN
     END LOOP;
 END
 $$;
+
+-- Rows past the last monthly partition land here instead of failing.
+-- Keep it empty: attaching a new month fails if the default partition
+-- already holds rows for that month.
+CREATE TABLE vehicle_status_default PARTITION OF vehicle_status DEFAULT;
 
 CREATE TABLE maintenance_task (
     task_id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

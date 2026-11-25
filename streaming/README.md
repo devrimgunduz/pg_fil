@@ -97,10 +97,17 @@ streaming=# EXPLAIN (COSTS OFF) SELECT count(*) FROM viewing_session
    ->  Seq Scan on viewing_session_p20261001 viewing_session
 ```
 
-`pg_partman-setup.sql` hands partitions from 2027-01 onward to
+`schema.sql` creates monthly partitions through 2027-12, a year past the
+generated data, plus a default partition (`viewing_session_default`) that
+catches anything later, so inserts never fail for lack of a partition.
+Keep the default partition empty, though: a new month can't be added while
+it holds rows for that month.
+
+`pg_partman-setup.sql` hands partitions from 2028-01 onward to
 [pg_partman](https://github.com/pgpartman/pg_partman), which then keeps
 four months ahead as long as `CALL partman.run_maintenance_proc()` runs
-regularly (from cron, for example). The Docker setup runs it for you.
+regularly, in a UTC session (from cron with `PGTZ=UTC`, for example). The Docker image runs it hourly with
+the `pg_partman_bgw` background worker.
 
 ## MERGE
 

@@ -115,8 +115,10 @@ SELECT price_trip(3::smallint, 'scooter', '2026-08-15 10:00+02', '2026-08-15 10:
 ## Partitioned telemetry
 
 `vehicle_status` is partitioned by month, with a BRIN index on
-`reported_at`. `pg_partman-setup.sql` hands partitions from 2027-01 onward
-to pg_partman.
+`reported_at`. `schema.sql` creates monthly partitions through 2027-12, a
+year past the generated data, plus a default partition
+(`vehicle_status_default`) for anything later. `pg_partman-setup.sql`
+hands partitions from 2028-01 onward to pg_partman.
 
 ## Materialized view
 

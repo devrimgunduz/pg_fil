@@ -192,15 +192,14 @@ CREATE TABLE meter_value (
 CREATE INDEX meter_value_measured_at_brin ON meter_value USING brin (measured_at);
 CREATE INDEX meter_value_session_idx ON meter_value (session_id, measured_at);
 
--- Monthly partitions for the generated data (2025-06 to 2026-12; local
--- midnight on 2025-07-01 is still June in UTC), named
--- the way pg_partman names them; pg_partman-setup.sql can take over from
--- 2027-01.
+-- Monthly partitions from 2025-06 (local midnight on 2025-07-01 is still
+-- June in UTC) to 2027-12, a year past the generated data, named the way
+-- pg_partman names them; pg_partman-setup.sql can take over from 2028-01.
 DO $$
 DECLARE
     m date;
 BEGIN
-    FOR m IN SELECT generate_series(date '2025-06-01', date '2026-12-01', interval '1 month')::date
+    FOR m IN SELECT generate_series(date '2025-06-01', date '2027-12-01', interval '1 month')::date
     LOOP
         EXECUTE format(
             'CREATE TABLE %I PARTITION OF meter_value FOR VALUES FROM (%L) TO (%L)',
@@ -210,6 +209,11 @@ BEGIN
     END LOOP;
 END
 $$;
+
+-- Rows past the last monthly partition land here instead of failing.
+-- Keep it empty: attaching a new month fails if the default partition
+-- already holds rows for that month.
+CREATE TABLE meter_value_default PARTITION OF meter_value DEFAULT;
 
 -- ocpp_message: raw OCPP 1.6 JSON messages as the chargers sent them
 -- (StartTransaction, StopTransaction, StatusNotification), kept for

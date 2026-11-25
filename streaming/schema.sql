@@ -252,13 +252,13 @@ CREATE TABLE viewing_session (
 CREATE INDEX viewing_session_profile_idx ON viewing_session (profile_id, started_at);
 CREATE INDEX viewing_session_title_idx ON viewing_session (title_id);
 
--- Monthly partitions for the generated data (2024-01 to 2026-12).
--- pg_partman-setup.sql can take over creating new ones from 2027-01.
+-- Monthly partitions from 2024-01 to 2027-12, a year past the generated
+-- data. pg_partman-setup.sql can take over creating new ones from 2028-01.
 DO $$
 DECLARE
     m date;
 BEGIN
-    FOR m IN SELECT generate_series(date '2024-01-01', date '2026-12-01', interval '1 month')::date
+    FOR m IN SELECT generate_series(date '2024-01-01', date '2027-12-01', interval '1 month')::date
     LOOP
         EXECUTE format(
             'CREATE TABLE %I PARTITION OF viewing_session FOR VALUES FROM (%L) TO (%L)',
@@ -268,6 +268,11 @@ BEGIN
     END LOOP;
 END
 $$;
+
+-- Rows past the last monthly partition land here instead of failing.
+-- Keep it empty: attaching a new month fails if the default partition
+-- already holds rows for that month.
+CREATE TABLE viewing_session_default PARTITION OF viewing_session DEFAULT;
 
 -- watch_progress: where each profile is in each title: the last episode and
 -- position, for "continue watching". Kept up to date from viewing_session

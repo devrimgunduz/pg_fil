@@ -67,7 +67,10 @@ ev-charging=# EXPLAIN (COSTS OFF) SELECT sum(power_w) FROM meter_value
  meter_value_p20261001_session_id_measured_at_idx | 1784 kB
 ```
 
-`pg_partman-setup.sql` hands partitions from 2027-01 onward to pg_partman.
+`schema.sql` creates monthly partitions through 2027-12, a year past the
+generated data, plus a default partition (`meter_value_default`) for
+anything later. `pg_partman-setup.sql` hands partitions from 2028-01
+onward to pg_partman.
 
 `date_bin()` buckets timestamps into intervals of any size, here a site's
 load curve in 30-minute buckets:
