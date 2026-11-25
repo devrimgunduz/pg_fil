@@ -45,7 +45,7 @@ FROM cancel
 RETURNING booking_id, listing_id, stay, nights, total;
 ROLLBACK;
 
-\echo '== 3. Bookings cannot overlap an availability block (trigger)'
+\echo '== 3. Bookings and availability blocks cannot overlap (triggers)'
 DO $$
 DECLARE
     blk availability_block;
@@ -54,6 +54,19 @@ BEGIN
     INSERT INTO booking (listing_id, guest_id, stay, guests, accommodation)
     VALUES (blk.listing_id, 1, blk.during, 1, 100);
     RAISE EXCEPTION 'booking over a block was accepted!';
+EXCEPTION WHEN exclusion_violation THEN
+    RAISE NOTICE 'rejected as expected: %', SQLERRM;
+END
+$$;
+
+DO $$
+DECLARE
+    bk booking;
+BEGIN
+    SELECT * INTO bk FROM booking WHERE status = 'confirmed' ORDER BY booking_id LIMIT 1;
+    INSERT INTO availability_block (listing_id, during, reason)
+    VALUES (bk.listing_id, bk.stay, 'owner stay');
+    RAISE EXCEPTION 'block over a booking was accepted!';
 EXCEPTION WHEN exclusion_violation THEN
     RAISE NOTICE 'rejected as expected: %', SQLERRM;
 END

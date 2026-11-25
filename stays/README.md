@@ -57,8 +57,11 @@ No two non-cancelled bookings of the same listing may have overlapping
 (`&&`) stays. Because stays are `[check-in, check-out)` ranges, back-to-back
 stays such as `[2026-12-03,2026-12-06)` and `[2026-12-06,2026-12-09)` are
 fine. The `WHERE` clause leaves cancelled bookings out, so their nights can
-be booked again. Overlapping a block in `availability_block` is rejected by
-a trigger, since one constraint can't span two tables.
+be booked again. Bookings and blocks in `availability_block` can't overlap
+either way: one constraint can't span two tables, so two triggers check it,
+one on each table. Both first lock the listing row, so a booking and a block
+for the same nights inserted at the same moment can't both get through: the
+second waits for the first to commit, then sees it.
 
 ```
 stays=# INSERT INTO booking (listing_id, guest_id, stay, guests, accommodation)

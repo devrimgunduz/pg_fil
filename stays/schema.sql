@@ -157,12 +157,28 @@ CREATE INDEX booking_guest_id_idx ON booking (guest_id);
 CREATE INDEX booking_stay_idx ON booking USING gist (stay);
 
 -- Bookings and blocks live in different tables, so a single exclusion
--- constraint can't cover both; this trigger rejects a booking whose nights
--- overlap one of the listing's availability blocks.
+-- constraint can't cover both; two triggers do it instead. One rejects a
+-- booking whose nights overlap one of the listing's availability blocks,
+-- the other a block that overlaps a booking.
+--
+-- On their own, the two checks could race: a booking and a block for the
+-- same nights, inserted at the same moment, would each miss the other's
+-- uncommitted row and both commit. So both triggers first lock the
+-- listing row (FOR NO KEY UPDATE, which doesn't block foreign key checks).
+-- The second one waits until the first commits or rolls back, and under
+-- READ COMMITTED (the default) its check then runs with a new snapshot that
+-- sees the other row. Only bookings and blocks of the same listing wait for
+-- each other. (Under REPEATABLE READ the snapshot is older than the lock,
+-- so use SERIALIZABLE there.)
+
 CREATE FUNCTION booking_check_not_blocked() RETURNS trigger
 LANGUAGE plpgsql AS $$
 BEGIN
-    IF NEW.status <> 'cancelled' AND EXISTS (
+    IF NEW.status = 'cancelled' THEN
+        RETURN NEW;
+    END IF;
+    PERFORM FROM listing WHERE listing_id = NEW.listing_id FOR NO KEY UPDATE;
+    IF EXISTS (
         SELECT FROM availability_block b
         WHERE b.listing_id = NEW.listing_id AND b.during && NEW.stay
     ) THEN
@@ -176,6 +192,26 @@ $$;
 CREATE TRIGGER booking_check_not_blocked
     BEFORE INSERT OR UPDATE OF listing_id, stay, status ON booking
     FOR EACH ROW EXECUTE FUNCTION booking_check_not_blocked();
+
+CREATE FUNCTION block_check_not_booked() RETURNS trigger
+LANGUAGE plpgsql AS $$
+BEGIN
+    PERFORM FROM listing WHERE listing_id = NEW.listing_id FOR NO KEY UPDATE;
+    IF EXISTS (
+        SELECT FROM booking bk
+        WHERE bk.listing_id = NEW.listing_id AND bk.stay && NEW.during
+          AND bk.status <> 'cancelled'
+    ) THEN
+        RAISE EXCEPTION 'listing % is booked during %', NEW.listing_id, NEW.during
+            USING ERRCODE = 'exclusion_violation';
+    END IF;
+    RETURN NEW;
+END
+$$;
+
+CREATE TRIGGER block_check_not_booked
+    BEFORE INSERT OR UPDATE OF listing_id, during ON availability_block
+    FOR EACH ROW EXECUTE FUNCTION block_check_not_booked();
 
 CREATE TABLE payment (
     payment_id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
