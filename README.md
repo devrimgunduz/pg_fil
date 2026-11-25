@@ -82,9 +82,9 @@ All three are in the PGDG repositories:
 
 | | apt | dnf |
 |---|---|---|
-| PostGIS | `postgresql-18-postgis-3` | `postgis37_18` |
-| pgvector | `postgresql-18-pgvector` | `pgvector_18` |
-| pg_partman | `postgresql-18-partman` | `pg_partman_18` |
+| PostGIS | `postgresql-19-postgis-3` | `postgis37_19` |
+| pgvector | `postgresql-19-pgvector` | `pgvector_19` |
+| pg_partman | `postgresql-19-partman` | `pg_partman_19` |
 
 ## Install with Docker or Podman Compose
 
@@ -98,7 +98,7 @@ or
 podman compose up --build
 ```
 
-On first start this builds an image from `postgres:18` with the three
+On first start this builds an image from `postgres:19` with the three
 extensions and creates all five databases (`streaming`, `stays`,
 `ev-charging`, `ticketing`, `micromobility`). The first start takes a few
 minutes while the data is generated. Then:
