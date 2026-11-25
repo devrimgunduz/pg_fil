@@ -11,7 +11,7 @@
 --
 --   PGTZ=UTC psql -d ev-charging -c "CALL partman.run_maintenance_proc()"
 --
--- Requires pg_partman 5.x (postgresql-18-partman on apt, pg_partman_18 on
+-- Requires pg_partman 5.x (postgresql-19-partman on apt, pg_partman_19 on
 -- dnf). Run after schema.sql:
 --   psql -d ev-charging -f pg_partman-setup.sql
 --
