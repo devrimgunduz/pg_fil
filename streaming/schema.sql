@@ -83,16 +83,24 @@ CREATE TABLE season (
     title_id integer NOT NULL REFERENCES title ON DELETE CASCADE,
     season_no smallint NOT NULL CHECK (season_no > 0),
     released_on date NOT NULL,
-    UNIQUE (title_id, season_no)
+    UNIQUE (title_id, season_no),
+    UNIQUE (season_id, title_id)    -- target of episode's composite key below
 );
 
+-- episode.title_id repeats the season's title so that viewing_session and
+-- watch_progress can check that an episode belongs to the title they name,
+-- with a plain composite foreign key. The composite key to season keeps the
+-- copy right: it must match the season's title.
 CREATE TABLE episode (
     episode_id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    season_id integer NOT NULL REFERENCES season ON DELETE CASCADE,
+    season_id integer NOT NULL,
+    title_id integer NOT NULL,
     episode_no smallint NOT NULL CHECK (episode_no > 0),
     name text NOT NULL,
     runtime_min smallint NOT NULL,
-    UNIQUE (season_id, episode_no)
+    UNIQUE (season_id, episode_no),
+    UNIQUE (episode_id, title_id),
+    FOREIGN KEY (season_id, title_id) REFERENCES season (season_id, title_id) ON DELETE CASCADE
 );
 
 CREATE TABLE title_credit (
@@ -169,7 +177,8 @@ CREATE TABLE account (
     account_id uuid PRIMARY KEY DEFAULT uuidv7(),
     email text NOT NULL UNIQUE,
     region_code char(2) NOT NULL REFERENCES region,
-    created_at timestamptz NOT NULL DEFAULT now()
+    created_at timestamptz NOT NULL DEFAULT now(),
+    UNIQUE (account_id, region_code)    -- target of subscription's composite key
 );
 
 CREATE TABLE profile (
@@ -200,14 +209,17 @@ CREATE INDEX device_info_idx ON device USING gin (info);
 -- most one plan at a time (WITHOUT OVERLAPS), and the temporal foreign key
 -- requires that the plan had a price in the account's region for the whole
 -- period: PERIOD valid_at must be covered by plan_price rows, even if it
--- spans several of them.
+-- spans several of them. The composite key to account makes region_code
+-- the account's region; an account with subscriptions can't change region.
 CREATE TABLE subscription (
     subscription_id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    account_id uuid NOT NULL REFERENCES account ON DELETE CASCADE,
+    account_id uuid NOT NULL,
     plan_id smallint NOT NULL,
     region_code char(2) NOT NULL,
     valid_at daterange NOT NULL,
     UNIQUE (account_id, valid_at WITHOUT OVERLAPS),
+    FOREIGN KEY (account_id, region_code) REFERENCES account (account_id, region_code)
+        ON DELETE CASCADE,
     FOREIGN KEY (plan_id, region_code, PERIOD valid_at)
         REFERENCES plan_price (plan_id, region_code, PERIOD valid_at)
 );
@@ -238,7 +250,7 @@ CREATE TABLE viewing_session (
     profile_id integer NOT NULL REFERENCES profile ON DELETE CASCADE,
     device_id integer NOT NULL REFERENCES device ON DELETE CASCADE,
     title_id integer NOT NULL REFERENCES title,
-    episode_id integer REFERENCES episode,
+    episode_id integer,
     started_at timestamptz NOT NULL,
     ended_at timestamptz NOT NULL,
     position_from_s integer NOT NULL DEFAULT 0,
@@ -246,7 +258,9 @@ CREATE TABLE viewing_session (
     quality video_quality NOT NULL,
     CHECK (ended_at > started_at),
     CHECK (position_to_s >= position_from_s),
-    PRIMARY KEY (session_id, started_at)
+    PRIMARY KEY (session_id, started_at),
+    -- the episode, if any, must belong to title_id
+    FOREIGN KEY (episode_id, title_id) REFERENCES episode (episode_id, title_id)
 ) PARTITION BY RANGE (started_at);
 
 CREATE INDEX viewing_session_profile_idx ON viewing_session (profile_id, started_at);
@@ -280,11 +294,12 @@ CREATE TABLE viewing_session_default PARTITION OF viewing_session DEFAULT;
 CREATE TABLE watch_progress (
     profile_id integer NOT NULL REFERENCES profile ON DELETE CASCADE,
     title_id integer NOT NULL REFERENCES title,
-    episode_id integer REFERENCES episode,
+    episode_id integer,
     position_s integer NOT NULL,
     finished boolean NOT NULL DEFAULT false,
     updated_at timestamptz NOT NULL,
-    PRIMARY KEY (profile_id, title_id)
+    PRIMARY KEY (profile_id, title_id),
+    FOREIGN KEY (episode_id, title_id) REFERENCES episode (episode_id, title_id)
 );
 
 CREATE INDEX watch_progress_recent_idx ON watch_progress (profile_id, updated_at DESC)
@@ -344,8 +359,10 @@ BEGIN
     MERGE INTO watch_progress w
     USING (SELECT p_profile_id AS profile_id, p_title_id AS title_id,
                   p_episode_id AS episode_id, p_to_s AS position_s, p_ended_at AS ended_at,
-                  p_to_s >= 0.95 * playable_runtime_s(p_title_id, p_episode_id)
-                      AND p_episode_id IS NOT DISTINCT FROM v_last_episode AS finished) s
+                  -- false, not NULL, for a series with no episodes yet
+                  coalesce(p_to_s >= 0.95 * playable_runtime_s(p_title_id, p_episode_id)
+                           AND p_episode_id IS NOT DISTINCT FROM v_last_episode,
+                           false) AS finished) s
     ON w.profile_id = s.profile_id AND w.title_id = s.title_id
     WHEN MATCHED AND s.ended_at > w.updated_at THEN
         UPDATE SET episode_id = s.episode_id, position_s = s.position_s,

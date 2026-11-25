@@ -74,6 +74,18 @@ subscription. The subscription may span several price periods, as long as
 they cover it with no gaps. A subscription starting in 2022, before any
 prices existed, is rejected.
 
+A plain composite foreign key makes that region the account's own:
+
+```sql
+FOREIGN KEY (account_id, region_code) REFERENCES account (account_id, region_code)
+```
+
+The same trick keeps viewing history consistent: `episode` carries its
+season's `title_id`, and `viewing_session` and `watch_progress` reference
+`episode (episode_id, title_id)`, so an episode of one series can't be
+logged against another title. For a movie, `episode_id` is NULL and the
+key isn't checked.
+
 Temporal tables join on overlapping periods. The `subscription_price` view
 splits each subscription at every price change:
 

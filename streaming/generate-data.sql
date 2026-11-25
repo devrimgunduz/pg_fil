@@ -291,8 +291,8 @@ FROM title t,
 WHERE t.kind = 'series' AND (s = 1 OR d < date '2026-10-31')
 ORDER BY 1, 2;
 
-INSERT INTO episode (season_id, episode_no, name, runtime_min)
-SELECT s.season_id, e,
+INSERT INTO episode (season_id, title_id, episode_no, name, runtime_min)
+SELECT s.season_id, s.title_id, e,
        CASE WHEN s.season_no = 1 AND e = 1 THEN 'Pilot'
             ELSE gen.pick('ep:' || s.season_id || ':' || e, ARRAY[
                 'The Arrival','Crossroads','Old Friends','Blackout','The Long Night','Homecoming',
