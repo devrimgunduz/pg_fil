@@ -256,36 +256,43 @@ BEGIN ATOMIC
 END;
 
 -- buy_held_seats: turn a customer's held seats for an event into an order
--- and tickets.
+-- and tickets. Only holds that haven't expired are bought. They are locked
+-- first, so a concurrent hold_seats() can't take one over (once expired)
+-- between the statements below, and the order, the tickets and the seats
+-- marked sold all cover exactly the same seats.
 CREATE FUNCTION buy_held_seats(p_event_id integer, p_customer_id integer,
                                p_now timestamptz DEFAULT now())
 RETURNS integer
 LANGUAGE plpgsql AS $$
 DECLARE
     v_order_id integer;
+    v_seats integer[];
 BEGIN
+    SELECT array_agg(seat_id ORDER BY seat_id) INTO v_seats
+    FROM (SELECT seat_id FROM event_seat
+          WHERE event_id = p_event_id AND held_by = p_customer_id
+            AND status = 'held' AND hold_expires_at >= p_now
+          FOR UPDATE) s;
+
+    IF v_seats IS NULL THEN
+        RAISE EXCEPTION 'customer % holds no seats for event %', p_customer_id, p_event_id;
+    END IF;
+
     INSERT INTO orders (customer_id, event_id, created_at, total)
     SELECT p_customer_id, p_event_id, p_now, sum(pt.price)
     FROM event_seat es JOIN price_tier pt USING (tier_id)
-    WHERE es.event_id = p_event_id AND es.held_by = p_customer_id
-      AND es.status = 'held' AND es.hold_expires_at >= p_now
-    HAVING count(*) > 0
+    WHERE es.event_id = p_event_id AND es.seat_id = ANY (v_seats)
     RETURNING order_id INTO v_order_id;
-
-    IF v_order_id IS NULL THEN
-        RAISE EXCEPTION 'customer % holds no seats for event %', p_customer_id, p_event_id;
-    END IF;
 
     INSERT INTO ticket (order_id, event_id, seat_id, holder_id, face_value, barcode)
     SELECT v_order_id, es.event_id, es.seat_id, p_customer_id, pt.price, uuidv7()
     FROM event_seat es JOIN price_tier pt USING (tier_id)
-    WHERE es.event_id = p_event_id AND es.held_by = p_customer_id
-      AND es.status = 'held' AND es.hold_expires_at >= p_now
+    WHERE es.event_id = p_event_id AND es.seat_id = ANY (v_seats)
     ORDER BY es.seat_id;
 
     UPDATE event_seat
     SET status = 'sold', held_by = NULL, hold_expires_at = NULL
-    WHERE event_id = p_event_id AND held_by = p_customer_id AND status = 'held';
+    WHERE event_id = p_event_id AND seat_id = ANY (v_seats);
 
     RETURN v_order_id;
 END
@@ -337,6 +344,11 @@ CREATE TRIGGER notify_ticket_sold
 -- The customer-facing app connects as fil_customer and sets
 -- app.customer_id for each request; the policies then only show that
 -- customer's tickets and orders. Table owners and superusers bypass RLS.
+--
+-- Once SET LOCAL has defined app.customer_id on a connection, it reads as
+-- '' (not NULL) after that transaction ends, so the policies map '' to
+-- NULL: a pooled connection with no customer set sees no rows instead of
+-- failing on ''::integer.
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'fil_customer') THEN
@@ -352,10 +364,10 @@ ALTER TABLE ticket ENABLE ROW LEVEL SECURITY;
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY ticket_holder ON ticket FOR SELECT TO fil_customer
-    USING (holder_id = current_setting('app.customer_id', true)::integer);
+    USING (holder_id = nullif(current_setting('app.customer_id', true), '')::integer);
 
 CREATE POLICY order_buyer ON orders FOR SELECT TO fil_customer
-    USING (customer_id = current_setting('app.customer_id', true)::integer);
+    USING (customer_id = nullif(current_setting('app.customer_id', true), '')::integer);
 
 --
 -- Views
