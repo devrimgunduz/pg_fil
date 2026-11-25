@@ -79,8 +79,8 @@ CREATE TABLE vehicle (
 );
 
 -- pricing_rule: what a ride costs in a city on a kind of vehicle, over
--- time. The temporal primary key means there is exactly one price for any
--- day.
+-- time. The temporal primary key means there is at most one price for any
+-- day; it doesn't rule out days with no price.
 CREATE TABLE pricing_rule (
     city_id smallint NOT NULL REFERENCES city,
     kind vehicle_kind NOT NULL,
