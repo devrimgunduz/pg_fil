@@ -343,7 +343,10 @@ CREATE TRIGGER notify_ticket_sold
 
 -- The customer-facing app connects as fil_customer and sets
 -- app.customer_id for each request; the policies then only show that
--- customer's tickets and orders. Table owners and superusers bypass RLS.
+-- customer's tickets, orders and transfers (sent or received). Table
+-- owners and superusers bypass RLS. event_seat is granted column by
+-- column, leaving out held_by, so customers see which seats are held but
+-- not by whom.
 --
 -- Once SET LOCAL has defined app.customer_id on a connection, it reads as
 -- '' (not NULL) after that transaction ends, so the policies map '' to
@@ -357,17 +360,24 @@ BEGIN
 END
 $$;
 
-GRANT SELECT ON venue, section, seat, artist, event, price_tier, event_seat,
+GRANT SELECT ON venue, section, seat, artist, event, price_tier,
                  ticket, orders, transfer TO fil_customer;
+GRANT SELECT (event_id, seat_id, tier_id, status, hold_expires_at)
+    ON event_seat TO fil_customer;
 
 ALTER TABLE ticket ENABLE ROW LEVEL SECURITY;
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE transfer ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY ticket_holder ON ticket FOR SELECT TO fil_customer
     USING (holder_id = nullif(current_setting('app.customer_id', true), '')::integer);
 
 CREATE POLICY order_buyer ON orders FOR SELECT TO fil_customer
     USING (customer_id = nullif(current_setting('app.customer_id', true), '')::integer);
+
+CREATE POLICY transfer_party ON transfer FOR SELECT TO fil_customer
+    USING (nullif(current_setting('app.customer_id', true), '')::integer
+           IN (from_customer, to_customer));
 
 --
 -- Views

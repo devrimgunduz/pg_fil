@@ -134,7 +134,8 @@ Asynchronous notification "ticket_sold" with payload
 ## Row-level security
 
 The customer app connects as `fil_customer` and sets `app.customer_id`
-per request. The policies then hide everyone else's tickets and orders:
+per request. The policies then hide everyone else's tickets, orders and
+transfers:
 
 ```sql
 BEGIN;
@@ -143,6 +144,10 @@ SET LOCAL app.customer_id = '42';
 SELECT count(*) FROM ticket;   -- 41, not 369622
 ROLLBACK;
 ```
+
+`fil_customer` can read `event_seat` to see which seats are free, but the
+grant lists its columns and leaves out `held_by`, so it can't see who holds
+a seat. `SELECT *` on it fails; name the columns instead.
 
 ## Recursive CTEs
 
