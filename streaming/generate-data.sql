@@ -7,8 +7,9 @@
 --
 -- The output is deterministic: every "random" choice is a hash of a key
 -- string (see gen.r below), never random() or the clock, so the same scale
--- always gives the same rows on any server, in any time zone. That includes
--- the UUIDv7 account ids, built by gen.uuid7() from the sign-up time.
+-- always gives the same rows on any little-endian server (x86-64, ARM64,
+-- ppc64le), in any time zone. That includes the UUIDv7 account ids, built
+-- by gen.uuid7() from the sign-up time.
 --
 -- The service launched on 2024-01-01 and the data is "as of" 2026-11-01.
 -- The catalog (1,200 titles) is the same at every scale; accounts, and

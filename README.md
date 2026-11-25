@@ -60,8 +60,9 @@ About the name: MySQL's sample database is Sakila, named after its dolphin
 There are no data dumps: each database's `generate-data.sql` builds its data
 in SQL, in about 15 to 40 seconds. The generators are **deterministic**:
 every "random" choice is a hash of a key string, never `random()` or the
-clock. The same scale gives the same rows on any server and in any time
-zone, so the results in the READMEs match what you get. That includes
+clock. The same scale gives the same rows on any little-endian server
+(x86-64, ARM64, ppc64le) and in any time zone, so the results in the
+READMEs match what you get. That includes
 UUIDv7 values, which are built from the generated timestamps.
 
 `scale` makes a database bigger:

@@ -7,7 +7,8 @@
 --
 -- The output is deterministic: every "random" choice is a hash of a key
 -- string (see gen.r below), never random() or the clock, so the same scale
--- always gives the same rows on any server, in any time zone.
+-- always gives the same rows on any little-endian server (x86-64, ARM64,
+-- ppc64le), in any time zone.
 --
 -- The data covers July to October 2026 and is "as of" 2026-11-01.
 --
