@@ -1,6 +1,6 @@
 # pg_fil
 
-Five sample databases for PostgreSQL, set in businesses people use today.
+Six sample databases for PostgreSQL, set in businesses people use today.
 
 [Pagila](https://github.com/devrimgunduz/pagila) is a DVD rental store, a
 fine schema for examples in books, tutorials and talks, but renting DVDs
@@ -19,31 +19,33 @@ About the name: MySQL's sample database is Sakila, named after its dolphin
 | [ev-charging](ev-charging/) | an electric vehicle charging network | time series with partitions and BRIN, `date_bin()`, two-range exclusion constraints, OCPP messages in JSONB, `range_agg()` |
 | [ticketing](ticketing/) | concert, sports and theatre tickets | `FOR UPDATE SKIP LOCKED`, advisory locks, partial unique indexes, recursive CTEs, row-level security, `LISTEN`/`NOTIFY` |
 | [micromobility](micromobility/) | shared bikes and e-scooters | PostGIS zones, routes, KNN and hexagon grids, `LATERAL`, materialized views, `CUBE` |
+| [aerly](aerly/) | shared trip planning and live flight tracking: the schema of the [Aerly](https://github.com/dpage/aerly) app | time zones (`timestamptz` with IANA zones, floating times), `LATERAL` latest position, recursive CTEs, partial and expression unique indexes, great-circle math in plain SQL |
 
 ### Features by database
 
-| Feature | streaming | stays | ev-charging | ticketing | micromobility |
-|---|:-:|:-:|:-:|:-:|:-:|
-| Temporal keys (`WITHOUT OVERLAPS`, PG 18) | ✓ | ✓ | | | ✓ |
-| Temporal foreign keys (`PERIOD`, PG 18) | ✓ | | | | |
-| Exclusion constraints | | ✓ | ✓ | ✓ | ✓ |
-| Range types and multiranges | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Declarative partitioning (+ optional pg_partman) | ✓ | | ✓ | | ✓ |
-| BRIN indexes | | | ✓ | | ✓ |
-| `MERGE ... RETURNING merge_action()` | ✓ | | | | |
-| UUIDv7 (PG 18) | ✓ | | | ✓ | |
-| JSONB, SQL/JSON path, `JSON_TABLE` | ✓ | ✓ | ✓ | | |
-| Full-text search, pg_trgm | ✓ | ✓ | | | |
-| PostGIS | | ✓ | ✓ | | ✓ |
-| pgvector | ✓ | | | | |
-| Window functions, gaps and islands | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Recursive CTEs | | | | ✓ | |
-| `SKIP LOCKED`, advisory locks | | | | ✓ | |
-| Row-level security | | | | ✓ | |
-| `LISTEN` / `NOTIFY` | | | | ✓ | |
-| Generated columns | ✓ | ✓ | ✓ | | ✓ |
-| Materialized views | | | | | ✓ |
-| `GROUPING SETS` / `ROLLUP` / `CUBE` | ✓ | | | | ✓ |
+| Feature | streaming | stays | ev-charging | ticketing | micromobility | aerly |
+|---|:-:|:-:|:-:|:-:|:-:|:-:|
+| Temporal keys (`WITHOUT OVERLAPS`, PG 18) | ✓ | ✓ | | | ✓ | |
+| Temporal foreign keys (`PERIOD`, PG 18) | ✓ | | | | | |
+| Exclusion constraints | | ✓ | ✓ | ✓ | ✓ | |
+| Range types and multiranges | ✓ | ✓ | ✓ | ✓ | ✓ | |
+| Declarative partitioning (+ optional pg_partman) | ✓ | | ✓ | | ✓ | |
+| BRIN indexes | | | ✓ | | ✓ | |
+| `MERGE ... RETURNING merge_action()` | ✓ | | | | | |
+| UUIDv7 (PG 18) | ✓ | | | ✓ | | |
+| JSONB, SQL/JSON path, `JSON_TABLE` | ✓ | ✓ | ✓ | | | |
+| Full-text search, pg_trgm | ✓ | ✓ | | | | |
+| PostGIS | | ✓ | ✓ | | ✓ | |
+| pgvector | ✓ | | | | | |
+| Window functions, gaps and islands | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Recursive CTEs | | | | ✓ | | ✓ |
+| `SKIP LOCKED`, advisory locks | | | | ✓ | | |
+| Row-level security | | | | ✓ | | |
+| `LISTEN` / `NOTIFY` | | | | ✓ | | |
+| Generated columns | ✓ | ✓ | ✓ | | ✓ | |
+| Materialized views | | | | | ✓ | |
+| `GROUPING SETS` / `ROLLUP` / `CUBE` | ✓ | | | | ✓ | |
+| Time zones (`AT TIME ZONE`, IANA zones, floating times) | | | | | | ✓ |
 
 ## What's in each directory
 
@@ -104,9 +106,9 @@ podman compose up --build
 ```
 
 On first start this builds an image from `postgres:19` with the three
-extensions and creates all five databases (`streaming`, `stays`,
-`ev-charging`, `ticketing`, `micromobility`). The first start takes a few
-minutes while the data is generated. Then:
+extensions and creates all six databases (`streaming`, `stays`,
+`ev-charging`, `ticketing`, `micromobility`, `aerly`). The first start
+takes a few minutes while the data is generated. Then:
 
 ```
 docker exec -it pg_fil psql -U postgres -d stays

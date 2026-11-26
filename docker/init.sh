@@ -4,7 +4,7 @@
 # generator and, where there is one, its pg_partman setup.
 set -euo pipefail
 
-for db in streaming stays ev-charging ticketing micromobility; do
+for db in streaming stays ev-charging ticketing micromobility aerly; do
     echo "pg_fil: loading ${db}"
     createdb -U "$POSTGRES_USER" "$db"
     psql -X -q -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$db" -f "/pg_fil/${db}/schema.sql"
