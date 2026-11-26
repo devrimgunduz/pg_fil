@@ -1,5 +1,8 @@
 # stays
 
+> The schema, data generator and queries of this database were vibe coded:
+> written with an AI coding assistant, then checked by running them.
+
 A short-term vacation rental marketplace. Hosts list apartments, houses,
 cabins and boats in 24 cities; guests book stays, pay, message the host and
 leave reviews. The data runs from January 2024 to March 2027 and is "as of"

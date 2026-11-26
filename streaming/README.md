@@ -1,5 +1,8 @@
 # streaming
 
+> The schema, data generator and queries of this database were vibe coded:
+> written with an AI coding assistant, then checked by running them.
+
 A subscription video streaming service: the video store, twenty years
 later. A catalog of 1,200 movies and series is licensed region by region
 for limited periods; accounts in 10 regions pick a plan whose price changes

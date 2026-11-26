@@ -1,5 +1,8 @@
 # ticketing
 
+> The schema, data generator and queries of this database were vibe coded:
+> written with an AI coding assistant, then checked by running them.
+
 Event ticketing for five venues: a West End-style theatre, a concert hall
 in Vienna, an arena in Rotterdam, a comedy club in Prague and a football
 stadium in Manchester. Each venue has a nested seating plan. Every event

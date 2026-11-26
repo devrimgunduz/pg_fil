@@ -1,5 +1,8 @@
 # micromobility
 
+> The schema, data generator and queries of this database were vibe coded:
+> written with an AI coding assistant, then checked by running them.
+
 Shared bikes, e-bikes and e-scooters in Amsterdam, Barcelona and Berlin.
 Riders unlock a vehicle, ride and park it. Vehicles report their position
 and battery; operations staff swap batteries, fix vehicles and move them

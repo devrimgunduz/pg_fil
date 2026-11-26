@@ -8,6 +8,10 @@ isn't a 2026 thing. pg_fil keeps the idea: realistic schemas and data that
 are fun to query, each built to show off a different part of modern
 PostgreSQL.
 
+The schemas, data generators and queries were vibe coded: written with an
+AI coding assistant, then checked by running them. Aerly's schema is the
+exception: it is taken unchanged from the Aerly app.
+
 About the name: MySQL's sample database is Sakila, named after its dolphin
 (the name was suggested from SiSwati), and Pagila is Postgres + Sakila.
 *Fil* is Turkish for elephant, after Slonik, the PostgreSQL elephant.

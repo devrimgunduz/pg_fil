@@ -1,5 +1,8 @@
 # ev-charging
 
+> The schema, data generator and queries of this database were vibe coded:
+> written with an AI coding assistant, then checked by running them.
+
 A European electric vehicle charging network. Four operators run 100 sites
 in 20 cities: fast DC hubs along ring roads and motorways, and AC chargers
 in garages and car parks. Drivers from five roaming partners (e-mobility

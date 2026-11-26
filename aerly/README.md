@@ -1,5 +1,9 @@
 # aerly
 
+> The data generator and queries of this database were vibe coded: written
+> with an AI coding assistant, then checked by running them. The schema is
+> Aerly's own.
+
 Shared trip planning and live flight tracking. This is the schema of
 [Aerly](https://github.com/dpage/aerly), Dave Page's app for "who's
 already in the air to the conference?", filled with generated data. A
