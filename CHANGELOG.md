@@ -1,5 +1,37 @@
 # Changelog
 
+## 2.1
+
+This release adds a sixth database, **aerly**. The other five are
+unchanged, so there is nothing to reload.
+
+### New database
+
+- **aerly:** shared trip planning and live flight tracking, using the
+  schema of [Aerly](https://github.com/dpage/aerly) as its 57 migrations
+  leave it (upstream commit `b703dad`). The 44 tables, constraints, indexes
+  and `plan_visible_to_member()` are unchanged, and `pg_dump --schema-only`
+  matches a database migrated by Aerly itself. The generator builds 2,000
+  users per unit of scale, with about 5,800 trips, 31,000 plans, 12,800
+  flight legs and 45,000 tracked positions. The data is "as of"
+  2026-11-01 00:00 UTC, two days before a made-up conference in Lisbon,
+  with eleven flights in the air. Passengers on the same flight share its
+  delay and fate, and cancelled flights are rebooked through
+  `supersedes_id` chains. `queries.sql` has 20 examples, covering time
+  zones with `AT TIME ZONE` and floating times, a recursive CTE over
+  rebookings, gaps and islands in flight tracks, and great-circle distance
+  in plain SQL. It needs PostgreSQL 18+ and no extensions. (477e230,
+  issue #4)
+
+### Docker image
+
+- `docker/init.sh` also loads aerly. (477e230)
+
+### Documentation
+
+- The top-level README lists aerly, adds it to the feature table, and adds
+  a row for time zones. (477e230)
+
 ## 2.0
 
 This release fixes integrity, security and partitioning bugs reported in
