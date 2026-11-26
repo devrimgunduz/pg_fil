@@ -2,7 +2,8 @@
 
 > The data generator and queries of this database were vibe coded: written
 > with an AI coding assistant, then checked by running them. The schema is
-> Aerly's own.
+> Aerly's own, and Aerly itself is vibe coded, so the schema design is
+> entirely LLM created too.
 
 Shared trip planning and live flight tracking. This is the schema of
 [Aerly](https://github.com/dpage/aerly), Dave Page's app for "who's
